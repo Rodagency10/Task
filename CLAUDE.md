@@ -365,36 +365,69 @@ export default function NewExpense() {
 
 ---
 
-## Tailwind CSS v4 Conventions
+## UI & Design System
 
-- `@import "tailwindcss"` in global CSS — no `tailwind.config.js`
-- Utility classes directly in JSX
-- Color palette:
-  - Primary: `blue-600` / `blue-700`
-  - Income/Paid: `green-500`
-  - Pending/Warning: `amber-500`
-  - Expense/Danger: `red-500`
-  - Neutral/Draft: `slate-400`
-- Mobile-first: `md:` tablet, `lg:` desktop
-- Sidebar: `w-64` desktop, drawer on mobile
+> Full design system documented in **@.claude/skills/ui-design.md** — read it before building any UI component.
+
+### Stack
+- **Tailwind CSS v4** — `@import "tailwindcss"` in `app/app.css`, no `tailwind.config.js`
+- **Font**: Urbanist (loaded via Google Fonts in `app/app.css`)
+- **Icons**: `iconsax-react` — named imports, `size` + `variant` props
+- **No Shadcn, no Radix** — all components are custom-built in `app/components/ui/`
+
+### Dark-first Palette (zinc scale)
+
+| Role       | Token              | Tailwind class    |
+|------------|--------------------|-------------------|
+| Background | `--color-bg`       | `bg-zinc-950`     |
+| Surface    | `--color-surface`  | `bg-zinc-900`     |
+| Border     | `--color-border`   | `border-zinc-800` |
+| Muted text | `--color-muted`    | `text-zinc-500`   |
+| Body text  | `--color-text`     | `text-zinc-100`   |
+| Heading    | `--color-heading`  | `text-white`      |
+| Success    | `--color-success`  | `text-emerald-500`|
+| Warning    | `--color-warning`  | `text-amber-500`  |
+| Danger     | `--color-danger`   | `text-red-500`    |
+
+**This app is dark-only.** Never use white/light backgrounds on pages.
 
 ### Status Badges
 
 ```typescript
-const PROJECT_STATUS_STYLES: Record<ProjectStatus, string> = {
-  draft: "bg-slate-100 text-slate-700",
-  active: "bg-blue-100 text-blue-700",
-  paused: "bg-amber-100 text-amber-700",
-  completed: "bg-green-100 text-green-700",
+// Use Badge component from app/components/ui/Badge.tsx
+// variant prop maps to semantic color
+
+const PROJECT_STATUS_BADGE: Record<ProjectStatus, BadgeVariant> = {
+  draft:     "muted",
+  active:    "info",
+  paused:    "warning",
+  completed: "success",
 };
 
-const DEBT_STATUS_STYLES: Record<DebtStatus, string> = {
-  pending: "bg-amber-100 text-amber-700",
-  partial: "bg-blue-100 text-blue-700",
-  paid: "bg-green-100 text-green-700",
-  cancelled: "bg-slate-100 text-slate-700",
+const DEBT_STATUS_BADGE: Record<DebtStatus, BadgeVariant> = {
+  pending:   "warning",
+  partial:   "info",
+  paid:      "success",
+  cancelled: "muted",
 };
 ```
+
+### Icon Usage
+
+```tsx
+import { Home2, Add, Wallet } from 'iconsax-react'
+
+// Sidebar active: variant="Bulk", size=18
+// Action buttons: size=18, no variant (Linear default)
+// Empty states: size=40, variant="Bulk"
+// Inline with text: size=16
+```
+
+### Layout Conventions
+- Page content: `max-w-6xl mx-auto px-6 py-8`
+- Stat grid: `grid grid-cols-2 lg:grid-cols-4 gap-4`
+- Card grid: `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4`
+- Sidebar: `w-64` fixed desktop, drawer on mobile
 
 ---
 
@@ -496,9 +529,11 @@ const total = subtotal + taxAmount;
 
 ## Important Reference Files
 
-- @src/types/database.ts — Generated Supabase types
-- @src/lib/supabase.ts — Supabase client
-- @src/lib/utils/invoice.ts — Invoice number logic
-- @src/lib/utils/finance.ts — Revenue aggregation & balance calculations
-- @src/components/ui/ — Base UI components to reuse
+- @.claude/skills/ui-design.md — Design system, components, icons, tokens
+- @app/app.css — Global CSS, Tailwind theme, font
+- @app/types/database.ts — Generated Supabase types
+- @app/lib/supabase.ts — Supabase client
+- @app/lib/utils/invoice.ts — Invoice number logic
+- @app/lib/utils/finance.ts — Revenue aggregation & balance calculations
+- @app/components/ui/ — Atomic UI components
 - @supabase/migrations/ — DB migration history
