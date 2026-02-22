@@ -1,14 +1,15 @@
 import { redirect, type LoaderFunctionArgs, type MetaFunction } from "react-router";
-import { useLoaderData, Link, useFetcher, useSearchParams } from "react-router";
+import { useLoaderData, Link, useSearchParams } from "react-router";
 import { TaskSquare, Add } from "iconsax-react";
 import { supabase } from "~/lib/supabase";
-import { getTasks, updateTask } from "~/lib/queries/tasks";
+import { getTasks } from "~/lib/queries/tasks";
 import { getProjects } from "~/lib/queries/projects";
 import { PageHeader } from "~/components/layout/PageHeader";
 import { Button } from "~/components/ui/Button";
 import { Badge } from "~/components/ui/Badge";
 import { Card } from "~/components/ui/Card";
 import { EmptyState } from "~/components/ui/EmptyState";
+import { PeriodFilter, filterByPeriod, type PeriodKey } from "~/components/ui/PeriodFilter";
 import { formatDate } from "~/lib/utils/dates";
 import {
   TASK_STATUS_BADGE,
@@ -54,9 +55,12 @@ export default function TasksIndex() {
   const view = searchParams.get("view") ?? "kanban";
   const projectFilter = searchParams.get("project") ?? "";
 
-  const filtered = projectFilter
+  const period = (searchParams.get("period") ?? "all") as PeriodKey;
+
+  const byProject = projectFilter
     ? tasks.filter((t) => t.project_id === projectFilter)
     : tasks;
+  const filtered = filterByPeriod(byProject, period, (t) => t.due_date ?? t.created_at);
 
   return (
     <div>
@@ -89,9 +93,14 @@ export default function TasksIndex() {
         }
       />
 
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        <PeriodFilter />
+      </div>
+
       {/* Project filter */}
       {projects.length > 0 && (
-        <div className="flex items-center gap-2 mb-6 flex-wrap">
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
           <button
             onClick={() => setSearchParams((p) => { p.delete("project"); return p; })}
             className={["px-3 py-1 text-xs font-medium rounded-full border transition-colors", !projectFilter ? "bg-zinc-950 text-white border-zinc-950" : "border-zinc-200 text-zinc-500 hover:border-zinc-400"].join(" ")}
@@ -124,11 +133,11 @@ export default function TasksIndex() {
           }
         />
       ) : view === "kanban" ? (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {STATUS_COLUMNS.map((col) => {
             const colTasks = filtered.filter((t) => t.status === col.key);
             return (
-              <div key={col.key} className="flex flex-col gap-2 min-w-50">
+              <div key={col.key} className="flex flex-col gap-2 min-w-48">
                 <div className={["flex items-center justify-between px-3 py-2 bg-white border-t-2 border-x border-b border-zinc-200 rounded-t-lg", STATUS_HEADER_COLOR[col.key]].join(" ").replace("border-x border-b border-zinc-200", "border-zinc-200")}>
                   <span className="text-xs font-semibold text-zinc-700">{col.label}</span>
                   <span className="text-xs text-zinc-400">{colTasks.length}</span>

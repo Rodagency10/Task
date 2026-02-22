@@ -20,7 +20,6 @@ import { StatCard } from "~/components/ui/StatCard";
 import { Badge } from "~/components/ui/Badge";
 import { Card } from "~/components/ui/Card";
 import { PageHeader } from "~/components/layout/PageHeader";
-import { formatCurrency } from "~/lib/utils/currency";
 import { formatDate } from "~/lib/utils/dates";
 import {
   PROJECT_STATUS_BADGE,
@@ -30,6 +29,7 @@ import {
   TASK_PRIORITY_BADGE,
   TASK_PRIORITY_LABEL,
 } from "~/lib/constants";
+import { useCurrency } from "~/lib/context/currency";
 
 export const meta: MetaFunction = () => [{ title: "Tableau de bord — Task" }];
 
@@ -52,17 +52,13 @@ export async function loader(_args: LoaderFunctionArgs) {
     activeProjects: projects.slice(0, 4),
     recentInvoices: invoices.slice(0, 5),
     activeTasks: tasks.slice(0, 5),
-    counts: {
-      projects: projects.length,
-      invoices: invoices.length,
-      tasks: tasks.length,
-    },
   };
 }
 
 export default function Dashboard() {
   const { user, finance, activeProjects, recentInvoices, activeTasks } =
     useLoaderData<typeof loader>();
+  const { formatCurrency } = useCurrency();
 
   const firstName = user.email?.split("@")[0] ?? "Vous";
 
@@ -152,10 +148,7 @@ export default function Dashboard() {
                   <p className="text-sm font-medium text-zinc-700">Aucun projet actif</p>
                   <p className="text-xs text-zinc-400 mt-0.5">Créez votre premier projet</p>
                 </div>
-                <Link
-                  to="/projects/new"
-                  className="text-xs font-medium text-zinc-950 hover:underline"
-                >
+                <Link to="/projects/new" className="text-xs font-medium text-zinc-950 hover:underline">
                   + Nouveau projet
                 </Link>
               </div>
@@ -187,10 +180,7 @@ export default function Dashboard() {
                 </Link>
               ))}
               {activeProjects.length === 4 && (
-                <Link
-                  to="/projects"
-                  className="text-xs text-center text-zinc-400 hover:text-zinc-700 py-1 transition-colors"
-                >
+                <Link to="/projects" className="text-xs text-center text-zinc-400 hover:text-zinc-700 py-1 transition-colors">
                   Voir tous les projets →
                 </Link>
               )}
@@ -221,10 +211,7 @@ export default function Dashboard() {
                   <p className="text-sm font-medium text-zinc-700">Aucune facture</p>
                   <p className="text-xs text-zinc-400 mt-0.5">Créez votre première facture</p>
                 </div>
-                <Link
-                  to="/invoices/new"
-                  className="text-xs font-medium text-zinc-950 hover:underline"
-                >
+                <Link to="/invoices/new" className="text-xs font-medium text-zinc-950 hover:underline">
                   + Nouvelle facture
                 </Link>
               </div>

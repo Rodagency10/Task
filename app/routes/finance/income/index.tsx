@@ -4,7 +4,7 @@ import {
   type ActionFunctionArgs,
   type MetaFunction,
 } from "react-router";
-import { useLoaderData, Form, useNavigation, Link } from "react-router";
+import { useLoaderData, Form, useNavigation, Link, useSearchParams } from "react-router";
 import { MoneySend, Add, Trash, ReceiptText } from "iconsax-react";
 import { supabase } from "~/lib/supabase";
 import { getIncome, createIncome, deleteIncome } from "~/lib/queries/income";
@@ -13,8 +13,9 @@ import { Button } from "~/components/ui/Button";
 import { Card } from "~/components/ui/Card";
 import { EmptyState } from "~/components/ui/EmptyState";
 import { Input, Textarea } from "~/components/ui/Input";
-import { formatCurrency } from "~/lib/utils/currency";
+import { PeriodFilter, filterByPeriod, type PeriodKey } from "~/components/ui/PeriodFilter";
 import { formatDate, toISODate } from "~/lib/utils/dates";
+import { useCurrency } from "~/lib/context/currency";
 
 export const meta: MetaFunction = () => [{ title: "Revenus — Task" }];
 
@@ -65,12 +66,16 @@ export async function action({ request }: ActionFunctionArgs) {
 
 export default function IncomeIndex() {
   const { income } = useLoaderData<typeof loader>();
+  const { formatCurrency } = useCurrency();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+  const [searchParams] = useSearchParams();
+  const period = (searchParams.get("period") ?? "all") as PeriodKey;
 
-  const total = income.reduce((sum, i) => sum + i.amount, 0);
-  const manualIncome = income.filter((i) => !i.invoice_id);
-  const invoiceIncome = income.filter((i) => i.invoice_id);
+  const filtered = filterByPeriod(income, period, (i) => i.date);
+  const total = filtered.reduce((sum, i) => sum + i.amount, 0);
+  const manualIncome = filtered.filter((i) => !i.invoice_id);
+  const invoiceIncome = filtered.filter((i) => i.invoice_id);
 
   return (
     <div>
@@ -79,10 +84,12 @@ export default function IncomeIndex() {
         description="Revenus depuis vos factures et entrées manuelles"
       />
 
+      <PeriodFilter className="mb-6" />
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Income list */}
         <div className="lg:col-span-2">
-          {income.length === 0 ? (
+          {filtered.length === 0 ? (
             <EmptyState
               icon={<MoneySend size={40} color="currentColor" variant="Bulk" />}
               title="Aucun revenu"
@@ -198,7 +205,7 @@ export default function IncomeIndex() {
                   required
                 />
                 <Input
-                  label="Montant (€) *"
+                  label="Montant *"
                   name="amount"
                   type="number"
                   min="0.01"

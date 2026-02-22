@@ -1,5 +1,5 @@
 import { redirect, type LoaderFunctionArgs, type MetaFunction } from "react-router";
-import { useLoaderData, Link } from "react-router";
+import { useLoaderData, Link, useSearchParams } from "react-router";
 import { MoneyForbidden, Add } from "iconsax-react";
 import { supabase } from "~/lib/supabase";
 import { getDebts } from "~/lib/queries/debts";
@@ -8,9 +8,10 @@ import { Button } from "~/components/ui/Button";
 import { Badge } from "~/components/ui/Badge";
 import { Card } from "~/components/ui/Card";
 import { EmptyState } from "~/components/ui/EmptyState";
-import { formatCurrency } from "~/lib/utils/currency";
+import { PeriodFilter, filterByPeriod, type PeriodKey } from "~/components/ui/PeriodFilter";
 import { formatDate } from "~/lib/utils/dates";
 import { DEBT_STATUS_BADGE, DEBT_STATUS_LABEL } from "~/lib/constants";
+import { useCurrency } from "~/lib/context/currency";
 
 export const meta: MetaFunction = () => [{ title: "Dettes — Task" }];
 
@@ -25,8 +26,13 @@ export async function loader(_args: LoaderFunctionArgs) {
 
 export default function DebtsIndex() {
   const { debts } = useLoaderData<typeof loader>();
+  const { formatCurrency } = useCurrency();
+  const [searchParams] = useSearchParams();
+  const period = (searchParams.get("period") ?? "all") as PeriodKey;
 
-  const totalPending = debts
+  const filtered = filterByPeriod(debts, period, (d) => d.created_at);
+
+  const totalPending = filtered
     .filter((d) => d.status !== "paid")
     .reduce((sum, d) => sum + (d.amount - d.amount_paid), 0);
 
@@ -44,7 +50,9 @@ export default function DebtsIndex() {
         }
       />
 
-      {debts.length === 0 ? (
+      <PeriodFilter className="mb-6" />
+
+      {filtered.length === 0 ? (
         <EmptyState
           icon={<MoneyForbidden size={40} color="currentColor" variant="Bulk" />}
           title="Aucune dette enregistrée"
@@ -69,7 +77,7 @@ export default function DebtsIndex() {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {debts.map((debt) => {
+            {filtered.map((debt) => {
               const remaining = debt.amount - debt.amount_paid;
               const progressPct =
                 debt.amount > 0 ? Math.round((debt.amount_paid / debt.amount) * 100) : 0;

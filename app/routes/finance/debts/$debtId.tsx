@@ -4,7 +4,7 @@ import {
   type ActionFunctionArgs,
   type MetaFunction,
 } from "react-router";
-import { useLoaderData, Form, useNavigation, Link } from "react-router";
+import { useLoaderData, Form, useNavigation, Link, useFetcher } from "react-router";
 import { ArrowLeft, Trash, TickCircle } from "iconsax-react";
 import { supabase } from "~/lib/supabase";
 import { getDebt, recordDebtPayment, cancelDebt } from "~/lib/queries/debts";
@@ -13,9 +13,10 @@ import { Button } from "~/components/ui/Button";
 import { Badge } from "~/components/ui/Badge";
 import { Card } from "~/components/ui/Card";
 import { Input } from "~/components/ui/Input";
-import { formatCurrency } from "~/lib/utils/currency";
 import { formatDate } from "~/lib/utils/dates";
 import { DEBT_STATUS_BADGE, DEBT_STATUS_LABEL } from "~/lib/constants";
+import { useCurrency } from "~/lib/context/currency";
+import { useConfirm } from "~/lib/context/confirm";
 
 export const meta: MetaFunction = () => [{ title: "Dette — Task" }];
 
@@ -56,12 +57,27 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
 export default function DebtDetail() {
   const { debt } = useLoaderData<typeof loader>();
+  const { formatCurrency } = useCurrency();
   const navigation = useNavigation();
+  const fetcher = useFetcher();
+  const confirm = useConfirm();
   const isSubmitting = navigation.state === "submitting";
 
   const remaining = debt.amount - debt.amount_paid;
   const progressPct =
     debt.amount > 0 ? Math.round((debt.amount_paid / debt.amount) * 100) : 0;
+
+  const handleCancel = async () => {
+    const ok = await confirm({
+      title: "Annuler cette dette ?",
+      message: "Cette action est irréversible.",
+      confirmLabel: "Annuler la dette",
+      variant: "danger",
+    });
+    if (ok) {
+      fetcher.submit({ intent: "cancel" }, { method: "post" });
+    }
+  };
 
   return (
     <div>
@@ -81,22 +97,14 @@ export default function DebtDetail() {
         action={
           <div className="flex items-center gap-2">
             {debt.status !== "cancelled" && debt.status !== "paid" && (
-              <Form
-                method="post"
-                onSubmit={(e) => {
-                  if (!confirm("Annuler cette dette ?")) e.preventDefault();
-                }}
+              <Button
+                variant="danger"
+                size="sm"
+                leftIcon={<Trash size={14} color="currentColor" />}
+                onClick={handleCancel}
               >
-                <input type="hidden" name="intent" value="cancel" />
-                <Button
-                  type="submit"
-                  variant="danger"
-                  size="sm"
-                  leftIcon={<Trash size={14} color="currentColor" />}
-                >
-                  Annuler
-                </Button>
-              </Form>
+                Annuler
+              </Button>
             )}
           </div>
         }
@@ -156,7 +164,7 @@ export default function DebtDetail() {
                 <input type="hidden" name="intent" value="payment" />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
-                    label="Montant reçu (€) *"
+                    label="Montant reçu *"
                     name="amount"
                     type="number"
                     min="0.01"

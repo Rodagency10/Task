@@ -32,8 +32,8 @@ body {
   background-color: theme(colors.zinc.50);
   color: theme(colors.zinc.700);
   font-family: var(--font-sans);
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: 17px;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -64,4 +64,39 @@ body {
 ::selection {
   background-color: theme(colors.zinc.200);
   color: theme(colors.zinc.900);
+}
+
+/* ── Print styles ─────────────────────────────────────────────────────────── */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  body {
+    background: white !important;
+    font-size: 12pt;
+    color: black;
+  }
+
+  aside,
+  .mobile-header,
+  .page-actions,
+  nav {
+    display: none !important;
+  }
+
+  .invoice-print-area {
+    border: none !important;
+    box-shadow: none !important;
+    width: 100% !important;
+  }
+
+  main > div {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
 }

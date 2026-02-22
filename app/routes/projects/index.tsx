@@ -8,13 +8,14 @@ import { Button } from "~/components/ui/Button";
 import { Badge } from "~/components/ui/Badge";
 import { Card } from "~/components/ui/Card";
 import { EmptyState } from "~/components/ui/EmptyState";
-import { formatCurrency } from "~/lib/utils/currency";
+import { PeriodFilter, filterByPeriod, type PeriodKey } from "~/components/ui/PeriodFilter";
 import { formatDate } from "~/lib/utils/dates";
 import {
   PROJECT_STATUS_BADGE,
   PROJECT_STATUS_LABEL,
 } from "~/lib/constants";
 import type { ProjectStatus } from "~/lib/types";
+import { useCurrency } from "~/lib/context/currency";
 
 export const meta: MetaFunction = () => [{ title: "Projets — Task" }];
 
@@ -37,12 +38,14 @@ const STATUS_TABS: { label: string; value: ProjectStatus | "all" }[] = [
 
 export default function ProjectsIndex() {
   const { projects } = useLoaderData<typeof loader>();
+  const { formatCurrency } = useCurrency();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeStatus = (searchParams.get("status") ?? "all") as ProjectStatus | "all";
+  const period = (searchParams.get("period") ?? "all") as PeriodKey;
 
-  const filtered = activeStatus === "all"
-    ? projects
-    : projects.filter((p) => p.status === activeStatus);
+  const byStatus =
+    activeStatus === "all" ? projects : projects.filter((p) => p.status === activeStatus);
+  const filtered = filterByPeriod(byStatus, period, (p) => p.start_date ?? p.created_at);
 
   return (
     <div>
@@ -59,12 +62,16 @@ export default function ProjectsIndex() {
       />
 
       {/* Status tabs */}
-      <div className="flex items-center gap-1 mb-6 border-b border-zinc-200 overflow-x-auto">
+      <div className="flex items-center gap-1 mb-4 border-b border-zinc-200 overflow-x-auto">
         {STATUS_TABS.map((tab) => (
           <button
             key={tab.value}
             onClick={() =>
-              setSearchParams(tab.value === "all" ? {} : { status: tab.value })
+              setSearchParams((p) => {
+                if (tab.value === "all") p.delete("status");
+                else p.set("status", tab.value);
+                return p;
+              })
             }
             className={[
               "px-3 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors -mb-px",
@@ -80,6 +87,9 @@ export default function ProjectsIndex() {
           </button>
         ))}
       </div>
+
+      {/* Period filter */}
+      <PeriodFilter className="mb-6" />
 
       {filtered.length === 0 ? (
         <EmptyState

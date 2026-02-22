@@ -1,5 +1,5 @@
 import { redirect, type LoaderFunctionArgs, type MetaFunction } from "react-router";
-import { useLoaderData, Link } from "react-router";
+import { useLoaderData, Link, useSearchParams } from "react-router";
 import { Wallet, TrendUp, MoneyRecive, MoneyForbidden, ArrowRight2 } from "iconsax-react";
 import { supabase } from "~/lib/supabase";
 import { getFinanceSummary } from "~/lib/utils/finance";
@@ -10,9 +10,10 @@ import { PageHeader } from "~/components/layout/PageHeader";
 import { StatCard } from "~/components/ui/StatCard";
 import { Badge } from "~/components/ui/Badge";
 import { Card } from "~/components/ui/Card";
-import { formatCurrency } from "~/lib/utils/currency";
+import { PeriodFilter, filterByPeriod, type PeriodKey } from "~/components/ui/PeriodFilter";
 import { formatDate } from "~/lib/utils/dates";
 import { DEBT_STATUS_BADGE, DEBT_STATUS_LABEL } from "~/lib/constants";
+import { useCurrency } from "~/lib/context/currency";
 
 export const meta: MetaFunction = () => [{ title: "Finances — Task" }];
 
@@ -31,18 +32,30 @@ export async function loader(_args: LoaderFunctionArgs) {
 
   return {
     finance,
-    recentExpenses: expenses.slice(0, 5),
-    activeDebts: debts.filter((d) => d.status !== "paid").slice(0, 5),
-    recentIncome: income.slice(0, 5),
+    expenses,
+    activeDebts: debts.filter((d) => d.status !== "paid"),
+    income,
   };
 }
 
 export default function FinanceIndex() {
-  const { finance, recentExpenses, activeDebts, recentIncome } = useLoaderData<typeof loader>();
+  const { finance, expenses, activeDebts, income } = useLoaderData<typeof loader>();
+  const { formatCurrency } = useCurrency();
+  const [searchParams] = useSearchParams();
+  const period = (searchParams.get("period") ?? "all") as PeriodKey;
+
+  const filteredExpenses = filterByPeriod(expenses, period, (e) => e.date);
+  const filteredIncome = filterByPeriod(income, period, (i) => i.date);
+
+  const recentExpenses = filteredExpenses.slice(0, 5);
+  const recentIncome = filteredIncome.slice(0, 5);
 
   return (
     <div>
       <PageHeader title="Finances" description="Vue d'ensemble de vos finances personnelles" />
+
+      {/* Period filter */}
+      <PeriodFilter className="mb-6" />
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -181,7 +194,7 @@ export default function FinanceIndex() {
           ) : (
             <Card padding="none">
               <div className="divide-y divide-zinc-100">
-                {activeDebts.map((debt) => {
+                {activeDebts.slice(0, 5).map((debt) => {
                   const remaining = debt.amount - debt.amount_paid;
                   return (
                     <Link

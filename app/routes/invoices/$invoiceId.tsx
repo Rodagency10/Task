@@ -4,15 +4,16 @@ import {
   type ActionFunctionArgs,
   type MetaFunction,
 } from "react-router";
-import { useLoaderData, Form, Link, useFetcher } from "react-router";
-import { ArrowLeft, Trash, Send2, TickCircle, CloseCircle } from "iconsax-react";
+import { useLoaderData, Form, Link } from "react-router";
+import { ArrowLeft, Trash, Send2, TickCircle, CloseCircle, Printer } from "iconsax-react";
 import { supabase } from "~/lib/supabase";
 import { getInvoice, updateInvoiceStatus, deleteInvoice } from "~/lib/queries/invoices";
 import { PageHeader } from "~/components/layout/PageHeader";
 import { Button } from "~/components/ui/Button";
 import { Badge } from "~/components/ui/Badge";
 import { Card } from "~/components/ui/Card";
-import { formatCurrency } from "~/lib/utils/currency";
+import { useCurrency } from "~/lib/context/currency";
+import { useConfirm } from "~/lib/context/confirm";
 import { formatDate } from "~/lib/utils/dates";
 import { INVOICE_STATUS_BADGE, INVOICE_STATUS_LABEL } from "~/lib/constants";
 import type { InvoiceStatus } from "~/lib/types";
@@ -83,10 +84,25 @@ const STATUS_ACTIONS: {
 
 export default function InvoiceDetail() {
   const { invoice } = useLoaderData<typeof loader>();
+  const { formatCurrency } = useCurrency();
+  const confirm = useConfirm();
 
   const availableActions = STATUS_ACTIONS.filter((a) =>
     a.from.includes(invoice.status),
   );
+
+  const handleDelete = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const ok = await confirm({
+      title: "Supprimer cette facture ?",
+      message: "Cette action est irréversible. La facture sera définitivement supprimée.",
+      confirmLabel: "Supprimer",
+      variant: "danger",
+    });
+    if (ok) {
+      (e.target as HTMLFormElement).submit();
+    }
+  };
 
   return (
     <div>
@@ -105,6 +121,14 @@ export default function InvoiceDetail() {
         description={invoice.client?.name ?? "Facture"}
         action={
           <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<Printer size={14} color="currentColor" />}
+              onClick={() => window.print()}
+            >
+              Exporter PDF
+            </Button>
             {availableActions.map((action) => {
               const Icon = action.icon;
               return (
@@ -123,12 +147,7 @@ export default function InvoiceDetail() {
               );
             })}
             {invoice.status !== "paid" && (
-              <Form
-                method="post"
-                onSubmit={(e) => {
-                  if (!confirm("Supprimer cette facture ?")) e.preventDefault();
-                }}
-              >
+              <Form method="post" onSubmit={handleDelete}>
                 <input type="hidden" name="intent" value="delete" />
                 <Button
                   type="submit"

@@ -8,9 +8,10 @@ import { Button } from "~/components/ui/Button";
 import { Badge } from "~/components/ui/Badge";
 import { Card } from "~/components/ui/Card";
 import { EmptyState } from "~/components/ui/EmptyState";
-import { formatCurrency } from "~/lib/utils/currency";
+import { PeriodFilter, filterByPeriod, type PeriodKey } from "~/components/ui/PeriodFilter";
 import { formatDate } from "~/lib/utils/dates";
 import { INVOICE_STATUS_BADGE, INVOICE_STATUS_LABEL } from "~/lib/constants";
+import { useCurrency } from "~/lib/context/currency";
 import type { InvoiceStatus } from "~/lib/types";
 
 export const meta: MetaFunction = () => [{ title: "Factures — Task" }];
@@ -32,14 +33,34 @@ const STATUS_TABS: { label: string; value: InvoiceStatus | "all" }[] = [
   { label: "En retard", value: "overdue" },
 ];
 
+function isOverdue(invoice: { status: InvoiceStatus; due_date: string }) {
+  return (
+    invoice.status === "sent" &&
+    invoice.due_date < new Date().toISOString().split("T")[0]
+  );
+}
+
 export default function InvoicesIndex() {
   const { invoices } = useLoaderData<typeof loader>();
+  const { formatCurrency } = useCurrency();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeStatus = (searchParams.get("status") ?? "all") as InvoiceStatus | "all";
+  const period = (searchParams.get("period") ?? "all") as PeriodKey;
 
-  const filtered =
-    activeStatus === "all" ? invoices : invoices.filter((i) => i.status === activeStatus);
+  // Auto-detect overdue client-side for display
+  const enriched = invoices.map((i) => ({
+    ...i,
+    displayStatus: isOverdue(i) ? ("overdue" as InvoiceStatus) : i.status,
+  }));
 
+  const byStatus =
+    activeStatus === "all"
+      ? enriched
+      : enriched.filter((i) =>
+          activeStatus === "overdue" ? isOverdue(i) : i.status === activeStatus
+        );
+
+  const filtered = filterByPeriod(byStatus, period, (i) => i.issue_date);
   const totalAmount = filtered.reduce((sum, i) => sum + i.total, 0);
 
   return (
@@ -56,13 +77,20 @@ export default function InvoicesIndex() {
         }
       />
 
+      {/* Period filter */}
+      <PeriodFilter className="mb-4" />
+
       {/* Status tabs */}
       <div className="flex items-center gap-1 mb-6 border-b border-zinc-200 overflow-x-auto">
         {STATUS_TABS.map((tab) => (
           <button
             key={tab.value}
             onClick={() =>
-              setSearchParams(tab.value === "all" ? {} : { status: tab.value })
+              setSearchParams((p) => {
+                if (tab.value === "all") p.delete("status");
+                else p.set("status", tab.value);
+                return p;
+              })
             }
             className={[
               "px-3 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors -mb-px",
@@ -75,8 +103,10 @@ export default function InvoicesIndex() {
             <span className="ml-1.5 text-xs text-zinc-400">
               (
               {tab.value === "all"
-                ? invoices.length
-                : invoices.filter((i) => i.status === tab.value).length}
+                ? enriched.length
+                : enriched.filter((i) =>
+                    tab.value === "overdue" ? isOverdue(i) : i.status === tab.value
+                  ).length}
               )
             </span>
           </button>
@@ -122,8 +152,8 @@ export default function InvoicesIndex() {
                   <span className="text-xs text-zinc-400 text-right hidden sm:block">
                     {invoice.due_date ? formatDate(invoice.due_date) : "—"}
                   </span>
-                  <Badge variant={INVOICE_STATUS_BADGE[invoice.status]} size="sm">
-                    {INVOICE_STATUS_LABEL[invoice.status]}
+                  <Badge variant={INVOICE_STATUS_BADGE[invoice.displayStatus]} size="sm">
+                    {INVOICE_STATUS_LABEL[invoice.displayStatus]}
                   </Badge>
                 </Link>
               ))}
