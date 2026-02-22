@@ -5,8 +5,8 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   hint?: string;
   error?: string;
-  placeholder?: string;
-  options: { value: string; label: string }[];
+  options?: { value: string; label: string }[];
+  children?: React.ReactNode;
 }
 
 const BASE =
@@ -18,8 +18,8 @@ export function Select({
   label,
   hint,
   error,
-  placeholder,
   options,
+  children,
   id,
   className = "",
   ...props
@@ -39,16 +39,12 @@ export function Select({
           className={[BASE, error ? ERROR : "", className].join(" ")}
           {...props}
         >
-          {placeholder && (
-            <option value="" disabled>
-              {placeholder}
-            </option>
-          )}
-          {options.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
+          {children ??
+            options?.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
         </select>
         <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500">
           <ArrowDown2 size={14} color="currentColor" />

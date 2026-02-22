@@ -9,7 +9,8 @@
       "Bash(npm install:*)",
       "Bash(pnpm add:*)",
       "Bash(pnpm typecheck:*)",
-      "Bash(xargs sed:*)"
+      "Bash(xargs sed:*)",
+      "mcp__supabase__execute_sql"
     ]
   },
   "enabledMcpjsonServers": [
