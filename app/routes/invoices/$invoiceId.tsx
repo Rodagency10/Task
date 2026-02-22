@@ -9,11 +9,13 @@ import { useState } from "react";
 import { ArrowLeft, Trash, Send2, TickCircle, CloseCircle, DocumentDownload } from "iconsax-react";
 import { supabase } from "~/lib/supabase";
 import { getInvoice, updateInvoiceStatus, deleteInvoice } from "~/lib/queries/invoices";
+import { getProfile } from "~/lib/queries/profile";
 import { PageHeader } from "~/components/layout/PageHeader";
 import { Button } from "~/components/ui/Button";
 import { Badge } from "~/components/ui/Badge";
 import { Card } from "~/components/ui/Card";
 import { useCurrency } from "~/lib/context/currency";
+import { formatAmount, convertAmount, type CurrencyCode } from "~/lib/utils/currency";
 import { useConfirm } from "~/lib/context/confirm";
 import { formatDate } from "~/lib/utils/dates";
 import { INVOICE_STATUS_BADGE, INVOICE_STATUS_LABEL } from "~/lib/constants";
@@ -26,8 +28,11 @@ export async function loader({ params }: LoaderFunctionArgs) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) throw redirect("/login");
-  const invoice = await getInvoice(params.invoiceId!, user.id);
-  return { invoice };
+  const [invoice, profile] = await Promise.all([
+    getInvoice(params.invoiceId!, user.id),
+    getProfile(user.id),
+  ]);
+  return { invoice, profile };
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
@@ -84,8 +89,11 @@ const STATUS_ACTIONS: {
 ];
 
 export default function InvoiceDetail() {
-  const { invoice } = useLoaderData<typeof loader>();
-  const { formatCurrency } = useCurrency();
+  const { invoice, profile } = useLoaderData<typeof loader>();
+  const { currency: displayCurrency } = useCurrency();
+  const invoiceCurrency = (invoice.currency ?? "EUR") as CurrencyCode;
+  const formatCurrency = (amount: number) =>
+    formatAmount(convertAmount(amount, invoiceCurrency, displayCurrency), displayCurrency);
   const confirm = useConfirm();
   const [downloading, setDownloading] = useState(false);
 
@@ -98,7 +106,16 @@ export default function InvoiceDetail() {
       ]);
       const { createElement } = await import("react");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const element = createElement(InvoicePDFDocument, { invoice }) as any;
+      const company = profile ? {
+        name: profile.company_name || "Mon Entreprise",
+        tagline: profile.company_tagline || undefined,
+        email: profile.company_email || undefined,
+        phone: profile.company_phone || undefined,
+        address: profile.company_address || undefined,
+        siret: profile.company_siret || undefined,
+        website: profile.company_website || undefined,
+      } : undefined;
+      const element = createElement(InvoicePDFDocument, { invoice, company }) as any;
       const blob = await pdf(element).toBlob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");

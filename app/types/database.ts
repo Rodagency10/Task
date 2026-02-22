@@ -452,6 +452,48 @@ export type Database = {
           },
         ]
       }
+      user_profiles: {
+        Row: {
+          company_address: string
+          company_email: string
+          company_name: string
+          company_phone: string
+          company_siret: string
+          company_tagline: string
+          company_website: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_address?: string
+          company_email?: string
+          company_name?: string
+          company_phone?: string
+          company_siret?: string
+          company_tagline?: string
+          company_website?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_address?: string
+          company_email?: string
+          company_name?: string
+          company_phone?: string
+          company_siret?: string
+          company_tagline?: string
+          company_website?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       time_entries: {
         Row: {
           created_at: string

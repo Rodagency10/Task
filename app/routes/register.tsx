@@ -50,7 +50,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   await supabase.from("expense_categories").insert(categories);
 
-  throw redirect("/dashboard");
+  throw redirect("/onboarding");
 }
 
 export default function Register() {

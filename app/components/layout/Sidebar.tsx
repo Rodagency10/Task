@@ -10,6 +10,7 @@ import {
   MoneyRecive,
   MoneyForbidden,
   MoneySend,
+  Setting2,
   LogoutCurve,
 } from "iconsax-react";
 import { NAV_SECTIONS } from "~/lib/constants";
@@ -26,6 +27,7 @@ const ICON_MAP = {
   MoneyRecive,
   MoneyForbidden,
   MoneySend,
+  Setting2,
 } as const;
 
 type IconName = keyof typeof ICON_MAP;
@@ -36,7 +38,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
-  const { currency, setCurrency, baseCurrency, setBaseCurrency } = useCurrency();
+  const { currency, setCurrency } = useCurrency();
 
 
   return (
@@ -82,7 +84,7 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                     onClick={onClose}
                     className={({ isActive }) =>
                       [
-                        "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                        "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold transition-colors",
                         isActive
                           ? "bg-zinc-100 text-zinc-900"
                           : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100",
@@ -119,10 +121,10 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
               {(Object.keys(CURRENCIES) as CurrencyCode[]).map((code) => (
                 <button
                   key={code}
-                  onClick={() => { setCurrency(code); setBaseCurrency(code); }}
+                  onClick={() => setCurrency(code)}
                   className={[
                     "flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors",
-                    currency === code && baseCurrency === code
+                    currency === code
                       ? "bg-zinc-950 text-white"
                       : "text-zinc-500 hover:bg-zinc-100",
                   ].join(" ")}

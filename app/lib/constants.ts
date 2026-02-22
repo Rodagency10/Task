@@ -134,4 +134,10 @@ export const NAV_SECTIONS = [
       { label: "Revenus", href: "/finance/income", icon: "MoneySend" },
     ],
   },
+  {
+    label: "Compte",
+    items: [
+      { label: "Paramètres", href: "/settings", icon: "Setting2" },
+    ],
+  },
 ] as const;

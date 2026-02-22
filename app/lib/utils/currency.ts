@@ -20,7 +20,7 @@ export const CURRENCIES: Record<CurrencyCode, CurrencyConfig> = {
  */
 export const EXCHANGE_RATES: Record<CurrencyCode, number> = {
   EUR: 1,
-  USD: 1.08,      // 1 EUR = 1.08 USD
+  USD: 1.1799,    // 1 EUR = 1.1799 USD
   XOF: 655.957,   // 1 EUR = 655.957 XOF (parité fixe UEMOA)
 };
 

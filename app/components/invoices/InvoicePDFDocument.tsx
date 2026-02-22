@@ -257,16 +257,27 @@ const STATUS_LABELS: Record<string, string> = {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
+interface CompanyInfo {
+  name: string;
+  tagline?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  siret?: string;
+  website?: string;
+}
+
 interface InvoicePDFDocumentProps {
   invoice: InvoiceWithItems;
-  companyName?: string;
+  company?: CompanyInfo;
 }
 
 export function InvoicePDFDocument({
   invoice,
-  companyName = "Mon Entreprise",
+  company,
 }: InvoicePDFDocumentProps) {
   const currency = (invoice.currency ?? "EUR") as CurrencyCode;
+  const companyName = company?.name || "Mon Entreprise";
 
   return (
     <Document
@@ -279,7 +290,18 @@ export function InvoicePDFDocument({
         <View style={s.header}>
           <View>
             <Text style={s.companyName}>{companyName}</Text>
-            <Text style={s.companyTagline}>Freelance &amp; Services</Text>
+            {company?.tagline ? (
+              <Text style={s.companyTagline}>{company.tagline}</Text>
+            ) : null}
+            {company?.email ? (
+              <Text style={s.companyTagline}>{company.email}</Text>
+            ) : null}
+            {company?.phone ? (
+              <Text style={s.companyTagline}>{company.phone}</Text>
+            ) : null}
+            {company?.address ? (
+              <Text style={s.companyTagline}>{company.address}</Text>
+            ) : null}
           </View>
           <View style={s.invoiceLabelBlock}>
             <Text style={s.invoiceLabel}>FACTURE</Text>
@@ -374,7 +396,9 @@ export function InvoicePDFDocument({
 
         {/* ── Footer ── */}
         <View style={s.footer} fixed>
-          <Text style={s.footerText}>Merci pour votre confiance.</Text>
+          <Text style={s.footerText}>
+            {company?.siret ? `SIRET : ${company.siret}` : "Merci pour votre confiance."}
+          </Text>
           <Text style={s.footerText}>{invoice.invoice_number}</Text>
         </View>
       </Page>

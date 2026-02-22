@@ -8,6 +8,7 @@ export default [
   route("login", "routes/login.tsx"),
   route("register", "routes/register.tsx"),
   route("logout", "routes/logout.tsx"),
+  route("onboarding", "routes/onboarding.tsx"),
 
   // App routes (with sidebar layout)
   layout("routes/_layout.tsx", [
@@ -45,6 +46,9 @@ export default [
     route("finance/debts/new", "routes/finance/debts/new.tsx"),
     route("finance/debts/:debtId", "routes/finance/debts/$debtId.tsx"),
     route("finance/income", "routes/finance/income/index.tsx"),
+
+    // Settings
+    route("settings", "routes/settings.tsx"),
 
     // 404
     route("*", "routes/$.tsx"),

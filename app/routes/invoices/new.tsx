@@ -19,6 +19,7 @@ import { Select } from "~/components/ui/Select";
 import { Button } from "~/components/ui/Button";
 import { Card } from "~/components/ui/Card";
 import { useCurrency } from "~/lib/context/currency";
+import { formatAmount } from "~/lib/utils/currency";
 
 export const meta: MetaFunction = () => [{ title: "Nouvelle facture — Task" }];
 
@@ -102,7 +103,7 @@ export default function NewInvoice() {
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
-  const { formatCurrency, baseCurrency } = useCurrency();
+  const { currency } = useCurrency();
 
   const [items, setItems] = useState<InvoiceItem[]>([
     { description: "", quantity: 1, unit_price: 0 },
@@ -133,7 +134,7 @@ export default function NewInvoice() {
       <PageHeader title="Nouvelle facture" description="Créez une nouvelle facture client" />
 
       <Form method="post" className="max-w-3xl">
-        <input type="hidden" name="currency" value={baseCurrency} />
+        <input type="hidden" name="currency" value={currency} />
         {actionData?.error && (
           <div className="mb-4 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
             {actionData.error}
@@ -215,7 +216,7 @@ export default function NewInvoice() {
                 />
                 <div className="flex items-center justify-end gap-1">
                   <span className="text-sm font-medium text-zinc-900">
-                    {formatCurrency(item.quantity * item.unit_price)}
+                    {formatAmount(item.quantity * item.unit_price, currency)}
                   </span>
                   {items.length > 1 && (
                     <button
@@ -244,17 +245,17 @@ export default function NewInvoice() {
           <div className="mt-6 pt-4 border-t border-zinc-100 flex flex-col items-end gap-1.5">
             <div className="flex items-center gap-8 text-sm text-zinc-600">
               <span>Sous-total</span>
-              <span className="font-medium text-zinc-900 w-28 text-right">{formatCurrency(subtotal)}</span>
+              <span className="font-medium text-zinc-900 w-28 text-right">{formatAmount(subtotal, currency)}</span>
             </div>
             {taxRate > 0 && (
               <div className="flex items-center gap-8 text-sm text-zinc-600">
                 <span>TVA ({taxRate}%)</span>
-                <span className="font-medium text-zinc-900 w-28 text-right">{formatCurrency(taxAmount)}</span>
+                <span className="font-medium text-zinc-900 w-28 text-right">{formatAmount(taxAmount, currency)}</span>
               </div>
             )}
             <div className="flex items-center gap-8 text-base font-bold text-zinc-950">
               <span>Total</span>
-              <span className="w-28 text-right">{formatCurrency(total)}</span>
+              <span className="w-28 text-right">{formatAmount(total, currency)}</span>
             </div>
           </div>
         </Card>
