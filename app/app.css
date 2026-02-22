@@ -27,6 +27,18 @@
   box-sizing: border-box;
 }
 
+/* Cursor pointer sur tous les éléments interactifs */
+button,
+a,
+[role="button"],
+[role="tab"],
+[role="link"],
+select,
+label[for],
+summary {
+  cursor: pointer;
+}
+
 html,
 body {
   background-color: theme(colors.zinc.50);

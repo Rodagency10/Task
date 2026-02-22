@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router";
+import { NavLink, Form } from "react-router";
 import {
   Home2,
   People,
@@ -14,7 +14,6 @@ import {
 } from "iconsax-react";
 import { NAV_SECTIONS } from "~/lib/constants";
 import { useCurrency, CURRENCIES, type CurrencyCode } from "~/lib/context/currency";
-import { supabase } from "~/lib/supabase";
 
 const ICON_MAP = {
   Home2,
@@ -37,13 +36,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
-  const { currency, setCurrency } = useCurrency();
-  const navigate = useNavigate();
+  const { currency, setCurrency, baseCurrency, setBaseCurrency } = useCurrency();
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/login");
-  };
 
   return (
     <>
@@ -125,10 +119,10 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
               {(Object.keys(CURRENCIES) as CurrencyCode[]).map((code) => (
                 <button
                   key={code}
-                  onClick={() => setCurrency(code)}
+                  onClick={() => { setCurrency(code); setBaseCurrency(code); }}
                   className={[
                     "flex-1 py-1.5 text-xs font-semibold rounded-lg transition-colors",
-                    currency === code
+                    currency === code && baseCurrency === code
                       ? "bg-zinc-950 text-white"
                       : "text-zinc-500 hover:bg-zinc-100",
                   ].join(" ")}
@@ -140,13 +134,15 @@ export function Sidebar({ isOpen = false, onClose }: SidebarProps) {
           </div>
 
           {/* Logout */}
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-zinc-500 hover:text-red-600 hover:bg-red-50 transition-colors w-full"
-          >
-            <LogoutCurve size={16} color="currentColor" />
-            Déconnexion
-          </button>
+          <Form method="post" action="/logout">
+            <button
+              type="submit"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-zinc-500 hover:text-red-600 hover:bg-red-50 transition-colors w-full"
+            >
+              <LogoutCurve size={16} color="currentColor" />
+              Déconnexion
+            </button>
+          </Form>
         </div>
       </aside>
     </>

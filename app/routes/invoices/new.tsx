@@ -18,7 +18,7 @@ import { Input, Textarea } from "~/components/ui/Input";
 import { Select } from "~/components/ui/Select";
 import { Button } from "~/components/ui/Button";
 import { Card } from "~/components/ui/Card";
-import { formatCurrency } from "~/lib/utils/currency";
+import { useCurrency } from "~/lib/context/currency";
 
 export const meta: MetaFunction = () => [{ title: "Nouvelle facture — Task" }];
 
@@ -46,6 +46,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const clientId = formData.get("client_id") as string;
   if (!clientId) return { error: "Veuillez sélectionner un client." };
+  const currency = (formData.get("currency") as string) || "EUR";
 
   const itemDescriptions = formData.getAll("item_description") as string[];
   const itemQuantities = formData.getAll("item_quantity") as string[];
@@ -74,6 +75,7 @@ export async function action({ request }: ActionFunctionArgs) {
         due_date:
           (formData.get("due_date") as string) ||
           toISODate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
+        currency,
         subtotal,
         tax_rate: taxRate,
         tax_amount: taxAmount,
@@ -100,6 +102,7 @@ export default function NewInvoice() {
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+  const { formatCurrency, baseCurrency } = useCurrency();
 
   const [items, setItems] = useState<InvoiceItem[]>([
     { description: "", quantity: 1, unit_price: 0 },
@@ -130,6 +133,7 @@ export default function NewInvoice() {
       <PageHeader title="Nouvelle facture" description="Créez une nouvelle facture client" />
 
       <Form method="post" className="max-w-3xl">
+        <input type="hidden" name="currency" value={baseCurrency} />
         {actionData?.error && (
           <div className="mb-4 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
             {actionData.error}

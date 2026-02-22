@@ -11,7 +11,8 @@
       "Bash(pnpm typecheck:*)",
       "Bash(xargs sed:*)",
       "mcp__supabase__execute_sql",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(node:*)"
     ]
   },
   "enabledMcpjsonServers": [

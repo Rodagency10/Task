@@ -1,9 +1,13 @@
-import { type RouteConfig, layout, route } from "@react-router/dev/routes";
+import { type RouteConfig, layout, route, index } from "@react-router/dev/routes";
 
 export default [
+  // Landing page (no layout)
+  index("routes/_marketing._index.tsx"),
+
   // Auth routes (no layout)
   route("login", "routes/login.tsx"),
   route("register", "routes/register.tsx"),
+  route("logout", "routes/logout.tsx"),
 
   // App routes (with sidebar layout)
   layout("routes/_layout.tsx", [
@@ -41,5 +45,8 @@ export default [
     route("finance/debts/new", "routes/finance/debts/new.tsx"),
     route("finance/debts/:debtId", "routes/finance/debts/$debtId.tsx"),
     route("finance/income", "routes/finance/income/index.tsx"),
+
+    // 404
+    route("*", "routes/$.tsx"),
   ]),
 ] satisfies RouteConfig;

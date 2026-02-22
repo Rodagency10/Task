@@ -10,6 +10,7 @@ import {
 } from "react-router";
 import { supabase } from "~/lib/supabase";
 import { DEFAULT_EXPENSE_CATEGORIES } from "~/lib/constants";
+import { PasswordInput } from "~/components/ui/PasswordInput";
 
 export const meta: MetaFunction = () => [{ title: "Inscription — Task" }];
 
@@ -90,35 +91,23 @@ export default function Register() {
               />
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="password" className="text-sm font-medium text-zinc-700">
-                Mot de passe
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                autoComplete="new-password"
-                placeholder="••••••••"
-                className="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2.5 text-base text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-zinc-400 transition-colors"
-              />
-            </div>
+            <PasswordInput
+              id="password"
+              name="password"
+              label="Mot de passe"
+              required
+              autoComplete="new-password"
+              placeholder="••••••••"
+            />
 
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="confirmPassword" className="text-sm font-medium text-zinc-700">
-                Confirmer le mot de passe
-              </label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                required
-                autoComplete="new-password"
-                placeholder="••••••••"
-                className="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2.5 text-base text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-zinc-400 transition-colors"
-              />
-            </div>
+            <PasswordInput
+              id="confirmPassword"
+              name="confirmPassword"
+              label="Confirmer le mot de passe"
+              required
+              autoComplete="new-password"
+              placeholder="••••••••"
+            />
 
             <button
               type="submit"

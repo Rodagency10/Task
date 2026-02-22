@@ -5,7 +5,8 @@ import {
   type MetaFunction,
 } from "react-router";
 import { useLoaderData, Form, Link } from "react-router";
-import { ArrowLeft, Trash, Send2, TickCircle, CloseCircle, Printer } from "iconsax-react";
+import { useState } from "react";
+import { ArrowLeft, Trash, Send2, TickCircle, CloseCircle, DocumentDownload } from "iconsax-react";
 import { supabase } from "~/lib/supabase";
 import { getInvoice, updateInvoiceStatus, deleteInvoice } from "~/lib/queries/invoices";
 import { PageHeader } from "~/components/layout/PageHeader";
@@ -86,6 +87,29 @@ export default function InvoiceDetail() {
   const { invoice } = useLoaderData<typeof loader>();
   const { formatCurrency } = useCurrency();
   const confirm = useConfirm();
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadPDF = async () => {
+    setDownloading(true);
+    try {
+      const [{ pdf }, { InvoicePDFDocument }] = await Promise.all([
+        import("@react-pdf/renderer"),
+        import("~/components/invoices/InvoicePDFDocument"),
+      ]);
+      const { createElement } = await import("react");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const element = createElement(InvoicePDFDocument, { invoice }) as any;
+      const blob = await pdf(element).toBlob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${invoice.invoice_number}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const availableActions = STATUS_ACTIONS.filter((a) =>
     a.from.includes(invoice.status),
@@ -124,10 +148,12 @@ export default function InvoiceDetail() {
             <Button
               variant="secondary"
               size="sm"
-              leftIcon={<Printer size={14} color="currentColor" />}
-              onClick={() => window.print()}
+              leftIcon={<DocumentDownload size={14} color="currentColor" />}
+              onClick={handleDownloadPDF}
+              disabled={downloading}
+              loading={downloading}
             >
-              Exporter PDF
+              {downloading ? "Génération..." : "Exporter PDF"}
             </Button>
             {availableActions.map((action) => {
               const Icon = action.icon;
