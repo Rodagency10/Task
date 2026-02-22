@@ -8,11 +8,10 @@ import {
 } from "~/lib/utils/currency";
 
 const LS_KEY = "task_currency";
-const LS_BASE_KEY = "task_base_currency";
 
-function getStored(key: string): CurrencyCode {
+function getStoredCurrency(): CurrencyCode {
   if (typeof window === "undefined") return "EUR";
-  const v = localStorage.getItem(key);
+  const v = localStorage.getItem(LS_KEY);
   if (v === "EUR" || v === "USD" || v === "XOF") return v;
   return "EUR";
 }
@@ -42,12 +41,10 @@ const CurrencyContext = createContext<CurrencyContextValue>({
 });
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
-  const [currency, setCurrencyState] = useState<CurrencyCode>(() =>
-    getStored(LS_KEY),
-  );
-  const [baseCurrency, setBaseCurrencyState] = useState<CurrencyCode>(() =>
-    getStored(LS_BASE_KEY),
-  );
+  const [currency, setCurrencyState] = useState<CurrencyCode>(getStoredCurrency);
+  // baseCurrency is always EUR — amounts in DB are stored in the currency entered at creation time
+  // and each invoice carries its own `currency` field. baseCurrency stays EUR as the pivot.
+  const [baseCurrency, setBaseCurrencyState] = useState<CurrencyCode>("EUR");
 
   const setCurrency = (code: CurrencyCode) => {
     setCurrencyState(code);
@@ -56,7 +53,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
 
   const setBaseCurrency = (code: CurrencyCode) => {
     setBaseCurrencyState(code);
-    localStorage.setItem(LS_BASE_KEY, code);
+    // Not persisted — baseCurrency is always EUR on page load
   };
 
   const convertAmount = (amount: number, from: CurrencyCode, to?: CurrencyCode) =>

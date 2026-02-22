@@ -1,5 +1,5 @@
 import { Document, Page, View, Text, StyleSheet } from "@react-pdf/renderer";
-import { formatAmount } from "~/lib/utils/currency";
+import { formatAmount, convertAmount } from "~/lib/utils/currency";
 import type { CurrencyCode } from "~/lib/utils/currency";
 import type { InvoiceWithItems } from "~/lib/types";
 
@@ -231,8 +231,8 @@ const s = StyleSheet.create({
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function fmt(amount: number, currency: CurrencyCode): string {
-  return formatAmount(amount, currency);
+function makeFmt(from: CurrencyCode, to: CurrencyCode) {
+  return (amount: number) => formatAmount(convertAmount(amount, from, to), to);
 }
 
 function fmtDate(dateStr: string): string {
@@ -270,13 +270,17 @@ interface CompanyInfo {
 interface InvoicePDFDocumentProps {
   invoice: InvoiceWithItems;
   company?: CompanyInfo;
+  displayCurrency?: CurrencyCode;
 }
 
 export function InvoicePDFDocument({
   invoice,
   company,
+  displayCurrency,
 }: InvoicePDFDocumentProps) {
-  const currency = (invoice.currency ?? "EUR") as CurrencyCode;
+  const invoiceCurrency = (invoice.currency ?? "EUR") as CurrencyCode;
+  const outputCurrency = displayCurrency ?? invoiceCurrency;
+  const fmt = makeFmt(invoiceCurrency, outputCurrency);
   const companyName = company?.name || "Mon Entreprise";
 
   return (
@@ -361,8 +365,8 @@ export function InvoicePDFDocument({
             >
               <Text style={[s.tableCell, s.colDescription]}>{item.description}</Text>
               <Text style={[s.tableCell, s.colQty]}>{item.quantity}</Text>
-              <Text style={[s.tableCell, s.colPrice]}>{fmt(item.unit_price, currency)}</Text>
-              <Text style={[s.tableCellBold, s.colTotal]}>{fmt(item.total, currency)}</Text>
+              <Text style={[s.tableCell, s.colPrice]}>{fmt(item.unit_price)}</Text>
+              <Text style={[s.tableCellBold, s.colTotal]}>{fmt(item.total)}</Text>
             </View>
           ))}
         </View>
@@ -371,18 +375,18 @@ export function InvoicePDFDocument({
         <View style={s.totalsContainer}>
           <View style={s.totalRow}>
             <Text style={s.totalLabel}>Sous-total HT</Text>
-            <Text style={s.totalValue}>{fmt(invoice.subtotal, currency)}</Text>
+            <Text style={s.totalValue}>{fmt(invoice.subtotal)}</Text>
           </View>
           {invoice.tax_rate > 0 ? (
             <View style={s.totalRow}>
               <Text style={s.totalLabel}>TVA ({invoice.tax_rate}%)</Text>
-              <Text style={s.totalValue}>{fmt(invoice.tax_amount, currency)}</Text>
+              <Text style={s.totalValue}>{fmt(invoice.tax_amount)}</Text>
             </View>
           ) : null}
           <View style={s.totalDivider} />
           <View style={s.totalRow}>
             <Text style={s.totalFinalLabel}>Total TTC</Text>
-            <Text style={s.totalFinalValue}>{fmt(invoice.total, currency)}</Text>
+            <Text style={s.totalFinalValue}>{fmt(invoice.total)}</Text>
           </View>
         </View>
 

@@ -115,7 +115,7 @@ export default function InvoiceDetail() {
         siret: profile.company_siret || undefined,
         website: profile.company_website || undefined,
       } : undefined;
-      const element = createElement(InvoicePDFDocument, { invoice, company }) as any;
+      const element = createElement(InvoicePDFDocument, { invoice, company, displayCurrency }) as any;
       const blob = await pdf(element).toBlob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
