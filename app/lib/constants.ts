@@ -110,28 +110,28 @@ export const DEFAULT_EXPENSE_CATEGORIES = [
 
 export const NAV_SECTIONS = [
   {
-    label: "General",
+    label: "Général",
     items: [
-      { label: "Dashboard", href: "/dashboard", icon: "Home2" },
+      { label: "Tableau de bord", href: "/dashboard", icon: "Home2" },
     ],
   },
   {
     label: "Freelance",
     items: [
       { label: "Clients", href: "/clients", icon: "People" },
-      { label: "Projects", href: "/projects", icon: "Briefcase" },
-      { label: "Tasks", href: "/tasks", icon: "TaskSquare" },
-      { label: "Invoices", href: "/invoices", icon: "ReceiptText" },
-      { label: "Time", href: "/time-entries", icon: "Timer1" },
+      { label: "Projets", href: "/projects", icon: "Briefcase" },
+      { label: "Tâches", href: "/tasks", icon: "TaskSquare" },
+      { label: "Factures", href: "/invoices", icon: "ReceiptText" },
+      { label: "Temps", href: "/time-entries", icon: "Timer1" },
     ],
   },
   {
-    label: "Finance",
+    label: "Finances",
     items: [
-      { label: "Finance", href: "/finance", icon: "Wallet" },
-      { label: "Expenses", href: "/finance/expenses", icon: "MoneyRecive" },
-      { label: "Debts", href: "/finance/debts", icon: "MoneyForbidden" },
-      { label: "Income", href: "/finance/income", icon: "MoneySend" },
+      { label: "Finances", href: "/finance", icon: "Wallet" },
+      { label: "Dépenses", href: "/finance/expenses", icon: "MoneyRecive" },
+      { label: "Dettes", href: "/finance/debts", icon: "MoneyForbidden" },
+      { label: "Revenus", href: "/finance/income", icon: "MoneySend" },
     ],
   },
 ] as const;

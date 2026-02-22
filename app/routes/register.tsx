@@ -11,7 +11,7 @@ import {
 import { supabase } from "~/lib/supabase";
 import { DEFAULT_EXPENSE_CATEGORIES } from "~/lib/constants";
 
-export const meta: MetaFunction = () => [{ title: "Register — Task" }];
+export const meta: MetaFunction = () => [{ title: "Inscription — Task" }];
 
 export async function loader({ request: _request }: LoaderFunctionArgs) {
   const { data: { user } } = await supabase.auth.getUser();
@@ -26,22 +26,22 @@ export async function action({ request }: ActionFunctionArgs) {
   const confirmPassword = formData.get("confirmPassword") as string;
 
   if (!email || !password || !confirmPassword) {
-    return { error: "All fields are required." };
+    return { error: "Tous les champs sont obligatoires." };
   }
 
   if (password !== confirmPassword) {
-    return { error: "Passwords do not match." };
+    return { error: "Les mots de passe ne correspondent pas." };
   }
 
   if (password.length < 6) {
-    return { error: "Password must be at least 6 characters." };
+    return { error: "Le mot de passe doit contenir au moins 6 caractères." };
   }
 
   const { data, error } = await supabase.auth.signUp({ email, password });
   if (error) return { error: error.message };
-  if (!data.user) return { error: "Registration failed. Please try again." };
+  if (!data.user) return { error: "Échec de l'inscription. Veuillez réessayer." };
 
-  // Seed default expense categories for the new user
+  // Seed des catégories de dépenses par défaut
   const categories = DEFAULT_EXPENSE_CATEGORIES.map((cat) => ({
     ...cat,
     user_id: data.user!.id,
@@ -58,26 +58,26 @@ export default function Register() {
   const isSubmitting = navigation.state === "submitting";
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-zinc-50 flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
-        {/* Logo / Brand */}
+        {/* Brand */}
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-white">Task</h1>
-          <p className="text-sm text-zinc-500 mt-1">Create your account</p>
+          <h1 className="text-3xl font-bold text-zinc-950">Task</h1>
+          <p className="text-base text-zinc-400 mt-2">Créez votre compte gratuitement</p>
         </div>
 
         {/* Card */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
-          <Form method="post" className="flex flex-col gap-4">
+        <div className="bg-white border border-zinc-200 rounded-2xl p-6 shadow-sm">
+          <Form method="post" className="flex flex-col gap-5">
             {actionData?.error && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-3 text-sm text-red-400">
+              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-600">
                 {actionData.error}
               </div>
             )}
 
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="email" className="text-sm font-medium text-zinc-300">
-                Email
+              <label htmlFor="email" className="text-sm font-medium text-zinc-700">
+                Adresse email
               </label>
               <input
                 id="email"
@@ -85,14 +85,14 @@ export default function Register() {
                 type="email"
                 required
                 autoComplete="email"
-                placeholder="you@example.com"
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600 focus:border-zinc-600"
+                placeholder="vous@exemple.com"
+                className="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2.5 text-base text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-zinc-400 transition-colors"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="password" className="text-sm font-medium text-zinc-300">
-                Password
+              <label htmlFor="password" className="text-sm font-medium text-zinc-700">
+                Mot de passe
               </label>
               <input
                 id="password"
@@ -101,13 +101,13 @@ export default function Register() {
                 required
                 autoComplete="new-password"
                 placeholder="••••••••"
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600 focus:border-zinc-600"
+                className="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2.5 text-base text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-zinc-400 transition-colors"
               />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="confirmPassword" className="text-sm font-medium text-zinc-300">
-                Confirm password
+              <label htmlFor="confirmPassword" className="text-sm font-medium text-zinc-700">
+                Confirmer le mot de passe
               </label>
               <input
                 id="confirmPassword"
@@ -116,24 +116,24 @@ export default function Register() {
                 required
                 autoComplete="new-password"
                 placeholder="••••••••"
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-zinc-600 focus:border-zinc-600"
+                className="w-full bg-white border border-zinc-200 rounded-lg px-3 py-2.5 text-base text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 focus:border-zinc-400 transition-colors"
               />
             </div>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-white text-zinc-950 font-semibold text-sm rounded-lg px-4 py-2.5 hover:bg-zinc-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+              className="w-full bg-zinc-950 text-white font-semibold text-base rounded-lg px-4 py-2.5 hover:bg-zinc-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-1"
             >
-              {isSubmitting ? "Creating account..." : "Create account"}
+              {isSubmitting ? "Création du compte..." : "Créer mon compte"}
             </button>
           </Form>
         </div>
 
-        <p className="text-center text-sm text-zinc-500 mt-4">
-          Already have an account?{" "}
-          <Link to="/login" className="text-zinc-300 hover:text-white transition-colors">
-            Sign in
+        <p className="text-center text-sm text-zinc-500 mt-5">
+          Déjà un compte ?{" "}
+          <Link to="/login" className="text-zinc-800 font-medium hover:text-zinc-950 transition-colors">
+            Se connecter
           </Link>
         </p>
       </div>

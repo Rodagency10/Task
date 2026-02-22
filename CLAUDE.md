@@ -375,21 +375,24 @@ export default function NewExpense() {
 - **Icons**: `iconsax-react` — named imports, `size` + `variant` props
 - **No Shadcn, no Radix** — all components are custom-built in `app/components/ui/`
 
-### Dark-first Palette (zinc scale)
+### Light Palette (zinc scale)
 
 | Role       | Token              | Tailwind class    |
 |------------|--------------------|-------------------|
-| Background | `--color-bg`       | `bg-zinc-950`     |
-| Surface    | `--color-surface`  | `bg-zinc-900`     |
-| Border     | `--color-border`   | `border-zinc-800` |
-| Muted text | `--color-muted`    | `text-zinc-500`   |
-| Body text  | `--color-text`     | `text-zinc-100`   |
-| Heading    | `--color-heading`  | `text-white`      |
-| Success    | `--color-success`  | `text-emerald-500`|
-| Warning    | `--color-warning`  | `text-amber-500`  |
-| Danger     | `--color-danger`   | `text-red-500`    |
+| Background | `--color-bg`       | `bg-zinc-50`      |
+| Surface    | `--color-surface`  | `bg-white`        |
+| Border     | `--color-border`   | `border-zinc-200` |
+| Muted text | `--color-muted`    | `text-zinc-400`   |
+| Body text  | `--color-text`     | `text-zinc-700`   |
+| Heading    | `--color-heading`  | `text-zinc-950`   |
+| Success    | `--color-success`  | `text-emerald-600`|
+| Warning    | `--color-warning`  | `text-amber-600`  |
+| Danger     | `--color-danger`   | `text-red-600`    |
 
-**This app is dark-only.** Never use white/light backgrounds on pages.
+**This app is light-only.** Never add `dark:` variants. Pages use `bg-zinc-50`, cards use `bg-white`.
+
+### Language
+**All UI text must be in French.** Labels, buttons, placeholders, page titles, nav items, empty states — everything visible to the user is in French.
 
 ### Status Badges
 

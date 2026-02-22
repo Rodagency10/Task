@@ -9,16 +9,14 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const VARIANTS: Record<NonNullable<ButtonProps["variant"]>, string> = {
-  primary: "bg-white text-zinc-950 hover:bg-zinc-100",
-  secondary:
-    "bg-zinc-900 text-zinc-100 hover:bg-zinc-800 border border-zinc-800",
-  ghost: "bg-transparent text-zinc-500 hover:text-zinc-100 hover:bg-zinc-800",
-  danger:
-    "bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20",
+  primary: "bg-zinc-950 text-white hover:bg-zinc-800",
+  secondary: "bg-white text-zinc-800 hover:bg-zinc-50 border border-zinc-200",
+  ghost: "bg-transparent text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100",
+  danger: "bg-red-50 text-red-600 hover:bg-red-100 border border-red-200",
 };
 
 const SIZES: Record<NonNullable<ButtonProps["size"]>, string> = {
-  sm: "px-3 py-1.5 text-xs rounded-lg gap-1.5",
+  sm: "px-3 py-1.5 text-sm rounded-lg gap-1.5",
   md: "px-4 py-2 text-sm rounded-lg gap-2",
   lg: "px-5 py-2.5 text-base rounded-lg gap-2",
 };
