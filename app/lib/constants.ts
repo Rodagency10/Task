@@ -47,63 +47,63 @@ export const DEBT_STATUS_BADGE: Record<DebtStatus, BadgeVariant> = {
   cancelled: "muted",
 };
 
-// ─── Display labels ───────────────────────────────────────────────────────────
+// ─── Display labels (French) ──────────────────────────────────────────────────
 
 export const PROJECT_STATUS_LABEL: Record<ProjectStatus, string> = {
-  draft: "Draft",
-  active: "Active",
-  paused: "Paused",
-  completed: "Completed",
+  draft: "Brouillon",
+  active: "Actif",
+  paused: "Pausé",
+  completed: "Terminé",
 };
 
 export const TASK_STATUS_LABEL: Record<TaskStatus, string> = {
-  todo: "To Do",
-  in_progress: "In Progress",
-  review: "Review",
-  done: "Done",
+  todo: "À faire",
+  in_progress: "En cours",
+  review: "En révision",
+  done: "Terminé",
 };
 
 export const TASK_PRIORITY_LABEL: Record<TaskPriority, string> = {
-  low: "Low",
-  medium: "Medium",
-  high: "High",
-  urgent: "Urgent",
+  low: "Basse",
+  medium: "Moyenne",
+  high: "Haute",
+  urgent: "Urgente",
 };
 
 export const INVOICE_STATUS_LABEL: Record<InvoiceStatus, string> = {
-  draft: "Draft",
-  sent: "Sent",
-  paid: "Paid",
-  overdue: "Overdue",
-  cancelled: "Cancelled",
+  draft: "Brouillon",
+  sent: "Envoyée",
+  paid: "Payée",
+  overdue: "En retard",
+  cancelled: "Annulée",
 };
 
 export const DEBT_STATUS_LABEL: Record<DebtStatus, string> = {
-  pending: "Pending",
-  partial: "Partial",
-  paid: "Paid",
-  cancelled: "Cancelled",
+  pending: "En attente",
+  partial: "Partiel",
+  paid: "Payée",
+  cancelled: "Annulée",
 };
 
 export const PAYMENT_METHOD_LABEL: Record<PaymentMethod, string> = {
-  cash: "Cash",
-  card: "Card",
-  bank_transfer: "Bank Transfer",
+  cash: "Espèces",
+  card: "Carte",
+  bank_transfer: "Virement bancaire",
   mobile_money: "Mobile Money",
-  other: "Other",
+  other: "Autre",
 };
 
-// ─── Default expense categories ────────────────────────────────────────────────
+// ─── Default expense categories (French) ─────────────────────────────────────
 
 export const DEFAULT_EXPENSE_CATEGORIES = [
-  { name: "Food & Dining", color: "orange", icon: "utensils", is_default: true },
+  { name: "Alimentation", color: "orange", icon: "utensils", is_default: true },
   { name: "Transport", color: "blue", icon: "car", is_default: true },
   { name: "Shopping", color: "pink", icon: "shopping-bag", is_default: true },
-  { name: "Bills & Utilities", color: "yellow", icon: "file-text", is_default: true },
-  { name: "Entertainment", color: "purple", icon: "film", is_default: true },
-  { name: "Health", color: "green", icon: "heart", is_default: true },
+  { name: "Factures & Charges", color: "yellow", icon: "file-text", is_default: true },
+  { name: "Loisirs", color: "purple", icon: "film", is_default: true },
+  { name: "Santé", color: "green", icon: "heart", is_default: true },
   { name: "Business", color: "slate", icon: "briefcase", is_default: true },
-  { name: "Other", color: "gray", icon: "more-horizontal", is_default: true },
+  { name: "Autre", color: "gray", icon: "more-horizontal", is_default: true },
 ] as const;
 
 // ─── Navigation ───────────────────────────────────────────────────────────────
